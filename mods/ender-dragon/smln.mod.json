@@ -1,7 +1,0 @@
-{
-  "id": "ender-dragon-boss",
-  "name": "Ender Dragon Boss",
-  "version": "1.0.0",
-  "priority": 100,
-  "renderer": "renderer.js"
-}
