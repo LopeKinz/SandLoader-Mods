@@ -5,8 +5,11 @@ Community mods for **Sandustry**, built for **SandLoader**.
 ## Mods
 
 # Sandustry MCP
-  Load the mod
-  Everything explained here : http://127.0.0.1:47652/
+Load the mod
+
+Everything explained here : http://127.0.0.1:47652/
+
+MCP Address :  http://127.0.0.1:47651/
 
 
 
