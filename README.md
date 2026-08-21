@@ -45,11 +45,11 @@ The ZIP contains two cooperating parts:
   in-game bridge.
 
 ```mermaid
-flowchart LR
-    A["MCP client"] -->|stdio| B["mcp-server.js"]
-    B -->|"TCP 127.0.0.1:47651"| C["native.js"]
-    D["Browser dashboard"] -->|"HTTP 127.0.0.1:47652"| C
-    C --> E["SandLoader + Sandustry"]
+graph LR
+    A[MCP client] --> B[mcp-server.js]
+    B --> C[native.js]
+    D[Browser dashboard] --> C
+    C --> E[SandLoader and Sandustry]
 ```
 
 Both network listeners bind to loopback only. Nothing is hosted on the public
@@ -75,12 +75,14 @@ modules.
 6. Make sure **Sandustry MCP Ultimate Debug Bridge** is enabled.
 7. Restart Sandustry, then load a save.
 
-SandLoader installs the package under its local mod directory. On Windows, the
-default path is:
+SandLoader installs the package under its local mod directory. The default
+location of `mcp-server.js` is:
 
-```text
-C:\Users\<Windows-user>\AppData\Roaming\sandustry\smln-mods\sandustry-mcp\
-```
+| Platform | Installed server path |
+|---|---|
+| Windows | `C:\Users\<user>\AppData\Roaming\sandustry\smln-mods\sandustry-mcp\mcp-server.js` |
+| Linux | `/home/<user>/.config/sandustry/smln-mods/sandustry-mcp/mcp-server.js` |
+| macOS | `/Users/<user>/Library/Application Support/sandustry/smln-mods/sandustry-mcp/mcp-server.js` |
 
 You can also use **SandLoader Mods → Open folder** and open the
 `sandustry-mcp` directory. The file needed by MCP clients is `mcp-server.js`.
@@ -92,10 +94,26 @@ start this file itself; normally, you do not run `start-mcp.cmd` separately.
 
 ### Claude Code, including the VS Code extension
 
-Run this in the terminal where the `claude` command is available:
+Run the command for your platform in a terminal where `claude` is available.
+The shell expands `$HOME` before Claude Code saves the configuration, so the
+stored argument is still an absolute path.
+
+Windows:
 
 ```powershell
 claude mcp add --transport stdio --scope user sandustry -- node "C:\Users\<Windows-user>\AppData\Roaming\sandustry\smln-mods\sandustry-mcp\mcp-server.js"
+```
+
+Linux:
+
+```bash
+claude mcp add --transport stdio --scope user sandustry -- node "$HOME/.config/sandustry/smln-mods/sandustry-mcp/mcp-server.js"
+```
+
+macOS:
+
+```bash
+claude mcp add --transport stdio --scope user sandustry -- node "$HOME/Library/Application Support/sandustry/smln-mods/sandustry-mcp/mcp-server.js"
 ```
 
 Then verify the registered server:
@@ -127,9 +145,11 @@ Open **Settings → Developer → Edit Config**, then add the server to
 }
 ```
 
-Save the file and completely restart Claude Desktop. Windows stores this config
-at `%APPDATA%\Claude\claude_desktop_config.json`. The MCP project also provides a
-general [local-server configuration guide](https://modelcontextprotocol.io/docs/2026-07-28/develop/connect-local-servers).
+Save the file and completely restart Claude Desktop. The config is stored at
+`%APPDATA%\Claude\claude_desktop_config.json` on Windows and
+`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS. The
+MCP project also provides a general
+[local-server configuration guide](https://modelcontextprotocol.io/docs/develop/connect-local-servers).
 
 ### Other stdio MCP clients
 
@@ -138,9 +158,12 @@ Use the same command and absolute argument in the client's local-server config:
 ```json
 {
   "command": "node",
-  "args": ["C:\\absolute\\path\\to\\sandustry-mcp\\mcp-server.js"]
+  "args": ["/absolute/path/to/sandustry-mcp/mcp-server.js"]
 }
 ```
+
+On Windows, use the absolute Windows path from the table above and escape each
+backslash as `\\` inside JSON.
 
 This is a local stdio MCP server. The URL on port `47652` is a dashboard and
 debug HTTP API; it is **not** a Streamable HTTP MCP endpoint.
@@ -158,8 +181,8 @@ Check each layer in this order:
 To verify the stdio adapter and inspect its tool definitions without connecting
 to the game:
 
-```powershell
-node "C:\absolute\path\to\sandustry-mcp\mcp-server.js" --print-tools
+```bash
+node "/absolute/path/to/sandustry-mcp/mcp-server.js" --print-tools
 ```
 
 That command should print a JSON array containing 73 tools and then exit. It
@@ -403,4 +426,3 @@ was built. A game or loader update may rename state paths, API namespaces, DOM
 selectors, or patch/runtime behavior even if the bridge itself still starts.
 Use `sandustry_status`, `get_loader_state`, and `get_sandloader_problems` when
 testing a new version.
-
